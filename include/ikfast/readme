@@ -1,0 +1,14 @@
+# https://zhuanlan.zhihu.com/p/97364652
+
+rosrun xacro xacro -o arm.urdf arm.xacro
+
+rosrun collada_urdf urdf_to_collada arm.urdf arm.dae
+
+rosrun moveit_kinematics round_collada_numbers.py arm.dae arm.dae "5"
+
+openrave-robot.py arm.dae --info links
+
+python /home/huchengsong/git/openrave/python/ikfast.py --robot=arm.dae --iktype=transform6d --baselink=0 --eelink=7 --savefile=ikfast61.cpp --maxcasedepth=1
+
+g++ ikfast61.cpp -o ikfast -llapack -std=c++11
+

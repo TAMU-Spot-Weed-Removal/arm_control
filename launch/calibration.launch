@@ -1,0 +1,13 @@
+<launch>
+      <arg name="camera_info_topic" default="/camera/camera_info"/>
+      <arg name="image_topic" default="/camera/image_raw"/>
+      <arg name="pointcloud_topic" default="/camera/points"/>
+      <arg name="target_pos" default="0.5 0.0 -0.6"/>
+
+      <node pkg="arm_control" name="calibration" type="calibration" output="screen">
+        <remap from="/camera/camera_info" to="$(arg camera_info_topic)" />
+        <remap from="/camera/image_raw" to="$(arg image_topic)" />
+        <remap from="/camera/points" to="$(arg pointcloud_topic)" />
+        <param name="calib_target_pos" type="str" value="$(arg target_pos)" />
+      </node>
+</launch>

@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="z1">
+    <xacro:property name="PI" value="3.1415926535897931"/>
+    <xacro:property name="torqueMax" value="30.0"/>
+    <xacro:property name="velocityMax" value="10"/>
+    <xacro:property name="joint1_PositionMin" value="${-PI*150/180}"/>
+    <xacro:property name="joint1_PositionMax" value="${PI*150/180}"/>
+    <xacro:property name="joint2_PositionMin" value="0.0"/>
+    <xacro:property name="joint2_PositionMax" value="${PI}"/>
+    <xacro:property name="joint3_PositionMin" value="${-PI*274/180}"/>
+    <xacro:property name="joint3_PositionMax" value="0.0"/>
+    <xacro:property name="joint4_PositionMin" value="${-PI*100/180}"/>
+    <xacro:property name="joint4_PositionMax" value="${PI*90/180}"/>
+    <xacro:property name="joint5_PositionMin" value="${-PI*99/180}"/>
+    <xacro:property name="joint5_PositionMax" value="${PI*99/180}"/>
+    <xacro:property name="joint6_PositionMin" value="${-PI*160/180}"/>
+    <xacro:property name="joint6_PositionMax" value="${PI*160/180}"/>
+
+    <link name="base_link" />
+    <link name="link01" />
+    <link name="link02" />
+    <link name="link03" />
+    <link name="link04" />
+    <link name="link05" />
+    <link name="link06" />
+    <link name="link07" />
+
+    <joint name="joint1" type="revolute">
+        <origin rpy="0 0 0" xyz="0 0 0.065"/>
+        <parent link="base_link"/>
+        <child link="link01"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint1_PositionMin}" upper="${joint1_PositionMax}"/>
+    </joint>
+
+    <joint name="joint2" type="revolute">
+        <origin rpy="0 0 0" xyz="0 0 0.04"/>
+        <parent link="link01"/>
+        <child link="link02"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint2_PositionMin}" upper="${joint2_PositionMax}"/>
+    </joint>
+
+    <joint name="joint3" type="revolute">
+        <origin rpy="0 0 0" xyz="-0.35 0 0"/>
+        <parent link="link02"/>
+        <child link="link03"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint3_PositionMin}" upper="${joint3_PositionMax}"/>
+    </joint>
+
+    <joint name="joint4" type="revolute">
+        <origin rpy="0 0 0" xyz="0.218 0 0.057"/>
+        <parent link="link03"/>
+        <child link="link04"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint4_PositionMin}" upper="${joint4_PositionMax}"/>
+    </joint>
+
+    <joint name="joint5" type="revolute">
+        <origin rpy="0 0 0" xyz="0.072 0.0 0.0"/>
+        <parent link="link04"/>
+        <child link="link05"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint5_PositionMin}" upper="${joint5_PositionMax}"/>
+    </joint>
+
+    <joint name="joint6" type="revolute">
+        <origin rpy="0 0 0" xyz="0.1 0.0 0.0"/>
+        <parent link="link05"/>
+        <child link="link06"/>
+        <axis xyz="1 0 0"/>
+        <limit effort="${torqueMax}" velocity="${velocityMax}" lower="${joint6_PositionMin}" upper="${joint6_PositionMax}"/>
+    </joint>
+
+    <joint name="joint7" type="fixed">
+        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+        <parent link="link06"/>
+        <child link="link07"/>
+    </joint>
+</robot>
