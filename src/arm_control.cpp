@@ -30,14 +30,11 @@ public:
     void SceneObservationCallback(geometry_msgs::Point32ConstPtr look_at_position)
     {
         // move camera by finding a suitable position
-        bool succeed;
+        bool succeed= false;
         Eigen::Vector3d target_pos(look_at_position->x, look_at_position->y, look_at_position->z);
-        Eigen::VectorXd jointAngles = Eigen::VectorXd::Zero(6);
-        Eigen::VectorXd minCostJointAngles = Eigen::VectorXd::Zero(6);
-        double cost = std::numeric_limits<double>::max();
-        for (double x = 0.15; x < 0.4; x += 0.025)
+        for (double x = 0.15; x <= 0.4; x += 0.025)
         {        
-            for (double z = 0; z < 0.3; z += 0.025)
+            for (double z = -0.2; z <= 0.3; z += 0.025)
             {   
                 Eigen::Isometry3d base_T_cam;
                 base_T_cam.translation() = Eigen::Vector3d(x, 0, z);
@@ -53,6 +50,7 @@ public:
                 Eigen::Isometry3d base_T_arm_end = base_T_cam * arm_end_T_cam.inverse();
                 base_T_arm_end.translation().y() = 0;  // dont move at the y direction
 
+                Eigen::VectorXd jointAngles = Eigen::VectorXd::Zero(6);
                 if(InverseKinematicsIKFast(base_T_arm_end.translation(), base_T_arm_end.linear(), jointAngles))
                 {
                     succeed = MoveToPosRot(base_T_arm_end.translation(), base_T_arm_end.linear());
@@ -103,6 +101,7 @@ public:
         } 
         else 
         {
+            ROS_WARN("no feasible solution found for weed observation");
             status.data = 1;  // the position is not reachable
         }
         weed_observation_status_pub.publish(status);
@@ -124,6 +123,7 @@ public:
 
         if (!succeed)
         {
+            ROS_WARN("no feasible solution found for weeding actuation");
             status.data = 1;  // the position is not reachable
             weed_actuation_status_pub.publish(status);
             return;
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
     else
     {
         ROS_ERROR("transformation between camera and arm end point is not available");
-        return;
+        return 1;
     }
     armController.arm_end_T_cam.translation() = Eigen::Vector3d(transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
     armController.arm_end_T_cam.linear() = 
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
     else
     {
         ROS_ERROR("transformation between torch and arm end point is not available");
-        return;
+        return 1;
     }
     armController.arm_end_T_torch.translation() = Eigen::Vector3d(transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
     armController.arm_end_T_torch.linear() = 
