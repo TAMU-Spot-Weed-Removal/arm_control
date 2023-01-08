@@ -49,6 +49,13 @@ target_link_libraries(
     Z1_SDK_Linux64
 )
 
+add_executable(arm_control src/arm_control.cpp)
+target_link_libraries(
+    arm_control
+    ${catkin_LIBRARIES}
+    Z1_SDK_Linux64
+    ${PCL_LIBRARIES}
+)
 
 
 
