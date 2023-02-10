@@ -85,6 +85,7 @@ public:
         while (1)
         {
             auto postureXYZ = posture.tail(3);
+            auto postureRPY = posture.head(3);
 
             char c = getch();
 
@@ -132,8 +133,20 @@ public:
                 postureXYZ.z() += 0.05; 
             } 
 
-            auto rot = Eigen::Quaterniond().setFromTwoVectors(Eigen::Vector3d::UnitX(), calibTargetPos - postureXYZ);
-            Eigen::Vector3d postureRPY = rot.toRotationMatrix().eulerAngles(2, 1, 0);
+            // roll pitch yaw
+            else if (c == 'r') {
+                postureRPY.x() -= M_PI / 12; 
+            } else if (c == 'f') {
+                postureRPY.x() += M_PI / 12;
+            } else if (c == 't') {
+                postureRPY.y() -= M_PI / 12;
+            } else if (c == 'g') {
+                postureRPY.y() += M_PI / 12;
+            } else if (c == 'y') {
+                postureRPY.z() -= M_PI / 12;
+            } else if (c == 'h') {
+                postureRPY.z() += M_PI / 12;
+            }
 
             MoveToRPYXYZ(postureRPY, postureXYZ);
         }
