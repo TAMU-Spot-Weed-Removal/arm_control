@@ -41,6 +41,8 @@ const std::pair<double, double> JOINT_LIMITS[NUM_JOINTS] = {
     std::pair<double, double>(-160.0 / 180.0 * M_PI,	160.0 / 180.0 * M_PI)
 };
 
+const double ANGULAR_SPEED_LIMIT[NUM_JOINTS] = {0.5, 0.75, 1.0, 1.0, 1.0, 1.0};
+
 void tokenize(std::string const &str, const char delim,
             std::vector<std::string> &out)
 {
@@ -150,6 +152,32 @@ public:
         startTrack(ArmFSMState::JOINTCTRL);
         Eigen::VectorXd qInit = _ctrlComp->lowstate->getQ();
         Eigen::VectorXd dq = jointAngles - qInit;
+
+        // make sure the angular speed does not exceed the limit of each joint
+        double run_time_with_curr_speed = std::numeric_limits<double>::min();
+        double run_time_with_scaled_speed = std::numeric_limits<double>::min();
+        double speed_scale_factor = 1;
+        for (int i = 0; i < NUM_JOINTS; ++i)
+        {
+            run_time_with_curr_speed = std::max(run_time_with_curr_speed, std::abs(dq[i]) / speed);
+        }
+        for (int i = 0; i < NUM_JOINTS; ++i)
+        {
+            double temp_speed = std::abs(dq[i]) / run_time_with_curr_speed;
+            speed_scale_factor = std::max(speed_scale_factor, temp_speed / ANGULAR_SPEED_LIMIT[i]);
+        }
+        speed /= speed_scale_factor;
+        if (speed_scale_factor > 1)
+        {
+            std::cout << "angular velocity scaled by a factor: " << speed_scale_factor << std::endl;
+        }
+
+        for (int i = 0; i < NUM_JOINTS; ++i)
+        {
+            run_time_with_scaled_speed = std::max(run_time_with_scaled_speed, std::abs(dq[i]) / speed);
+        }
+        Eigen::VectorXd speed_each_joint = dq / run_time_with_scaled_speed;
+
         unsigned long stepCount = 0;
         while (1) 
         {
@@ -158,7 +186,7 @@ public:
                 break;
             }
 
-            q = qInit + stepCount * dq * _ctrlComp->dt * speed;    // max speed 1 rad/s
+            q = qInit + stepCount * speed_each_joint * _ctrlComp->dt;    // max speed 1 rad/s
             stepCount++;
             usleep(_ctrlComp->dt * 1000000);
         }
