@@ -10,6 +10,8 @@
 
 #include <CustomUnitreeArm.h>
 
+double WEED_OBSERVATION_HEIGHT = 0;  // relative to the arm base
+
 class ArmController : public CustomUnitreeArm
 {
 public:
@@ -85,7 +87,7 @@ public:
     {
         // get camera's position and rotation
         Eigen::Isometry3d base_T_cam;
-        base_T_cam.translation() = Eigen::Vector3d(weed_position->x, weed_position->y, 0.0);  // observe from above the weed
+        base_T_cam.translation() = Eigen::Vector3d(weed_position->x, weed_position->y, WEED_OBSERVATION_HEIGHT);  // observe from above the weed
         base_T_cam.linear() = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY()).toRotationMatrix() * 
                               Eigen::AngleAxisd(-0.5 * M_PI, Eigen::Vector3d::UnitZ()).toRotationMatrix();
 
@@ -114,7 +116,8 @@ public:
         // get torch's position and rotation
         Eigen::Isometry3d base_T_torch;
         base_T_torch.translation() = Eigen::Vector3d(weed_position->x, weed_position->y, weed_position->z);  // observe from above the weed
-        base_T_torch.linear() = Eigen::AngleAxisd(0.5 * M_PI, Eigen::Vector3d::UnitY()).toRotationMatrix();
+        base_T_torch.linear() = Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY()).toRotationMatrix() * 
+                                Eigen::AngleAxisd(-0.5 * M_PI, Eigen::Vector3d::UnitZ()).toRotationMatrix();
 
         // get arm endpoint's position and rotation
         Eigen::Isometry3d base_T_arm_end = base_T_torch * arm_end_T_torch.inverse();
