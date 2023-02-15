@@ -33,7 +33,8 @@ const Eigen::Vector3d LINKS[NUM_JOINTS + 1] = {
 };
 
 const std::pair<double, double> JOINT_LIMITS[NUM_JOINTS] = {
-    std::pair<double, double>(-150.0 / 180.0 * M_PI,	150.0 / 180.0 * M_PI),
+    // std::pair<double, double>(-150.0 / 180.0 * M_PI,	150.0 / 180.0 * M_PI),
+    std::pair<double, double>(-90.0 / 180.0 * M_PI,	90.0 / 180.0 * M_PI),
     std::pair<double, double>(  0.0 / 180.0 * M_PI,	    180.0 / 180.0 * M_PI),
     std::pair<double, double>(-165.0 / 180.0 * M_PI,	  0.0 / 180.0 * M_PI),
     std::pair<double, double>( -80.0 / 180.0 * M_PI,	 80.0 / 180.0 * M_PI),
@@ -41,7 +42,7 @@ const std::pair<double, double> JOINT_LIMITS[NUM_JOINTS] = {
     std::pair<double, double>(-160.0 / 180.0 * M_PI,	160.0 / 180.0 * M_PI)
 };
 
-const double ANGULAR_SPEED_LIMIT[NUM_JOINTS] = {0.5, 0.75, 1.0, 1.0, 1.0, 1.0};
+const double ANGULAR_SPEED_LIMIT[NUM_JOINTS] = {0.5, 0.5, 0.5, 0.75, 0.75, 0.75};
 
 void tokenize(std::string const &str, const char delim,
             std::vector<std::string> &out)
@@ -152,6 +153,11 @@ public:
         startTrack(ArmFSMState::JOINTCTRL);
         Eigen::VectorXd qInit = _ctrlComp->lowstate->getQ();
         Eigen::VectorXd dq = jointAngles - qInit;
+	
+        std::cout << "-----------Start moving the arm----------- " << std::endl;
+        std::cout << "Starting angles: " << qInit.transpose() * 180 / M_PI << std::endl;
+        std::cout << "Target angles: " << jointAngles.transpose() * 180 / M_PI << std::endl;
+
 
         // make sure the angular speed does not exceed the limit of each joint
         double run_time_with_curr_speed = std::numeric_limits<double>::min();
@@ -169,7 +175,7 @@ public:
         speed /= speed_scale_factor;
         if (speed_scale_factor > 1)
         {
-            std::cout << "angular velocity scaled by a factor: " << speed_scale_factor << std::endl;
+            std::cout << "Angular velocity scaled by a factor: " << speed_scale_factor << std::endl;
         }
 
         for (int i = 0; i < NUM_JOINTS; ++i)
@@ -178,17 +184,24 @@ public:
         }
         Eigen::VectorXd speed_each_joint = dq / run_time_with_scaled_speed;
 
+        unsigned long targetStepCount = run_time_with_scaled_speed / _ctrlComp->dt;
         unsigned long stepCount = 0;
-        while (1) 
+        while (stepCount < targetStepCount) 
         {
             if ((_ctrlComp->lowstate->getQ() - jointAngles).norm() < 0.05)
             {
+                std::cout << "Arm reached target" << std::endl;
                 break;
             }
 
             q = qInit + stepCount * speed_each_joint * _ctrlComp->dt;    // max speed 1 rad/s
             stepCount++;
             usleep(_ctrlComp->dt * 1000000);
+
+            if (stepCount == targetStepCount)
+            {
+                std::cout << "Arm moved with enough steps" << std::endl;
+            }
         }
 
         _ctrlComp->sendCmd.track = false;

@@ -34,23 +34,22 @@ public:
         // move camera by finding a suitable position
         bool succeed= false;
         Eigen::Vector3d target_pos(look_at_position->x, look_at_position->y, look_at_position->z);
-        for (double x = 0.15; x <= 0.4; x += 0.025)
-        {        
-            for (double z = -0.2; z <= 0.3; z += 0.025)
+        for (double x = 0.2; x <= 0.4; x += 0.01)
+        {   
+            for (double z = -0.2; z <= 0.2; z += 0.01)
             {   
                 Eigen::Isometry3d base_T_cam;
                 base_T_cam.translation() = Eigen::Vector3d(x, 0, z);
                 Eigen::Vector3d x_axis, y_axis, z_axis;
                 z_axis = (target_pos - base_T_cam.translation()).normalized();
-                x_axis = z_axis.cross(Eigen::Vector3d::UnitZ());
-                y_axis = z_axis.cross(x_axis);
+                x_axis = z_axis.cross(Eigen::Vector3d::UnitZ()).normalized();
+                y_axis = z_axis.cross(x_axis).normalized();
                 base_T_cam.linear().block(0, 0, 3, 1) = x_axis;
                 base_T_cam.linear().block(0, 1, 3, 1) = y_axis;
                 base_T_cam.linear().block(0, 2, 3, 1) = z_axis;
             
                 // get arm endpoint's position and rotation
                 Eigen::Isometry3d base_T_arm_end = base_T_cam * arm_end_T_cam.inverse();
-                base_T_arm_end.translation().y() = 0;  // dont move at the y direction
 
                 Eigen::VectorXd jointAngles = Eigen::VectorXd::Zero(6);
                 if(InverseKinematicsIKFast(base_T_arm_end.translation(), base_T_arm_end.linear(), jointAngles))
