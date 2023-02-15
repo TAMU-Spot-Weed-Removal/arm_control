@@ -158,7 +158,7 @@ public:
         tf::Transform transform;
         transform.setOrigin(tf::Vector3(endPointPos.x(), endPointPos.y(), endPointPos.z()));
         transform.setRotation(tf::Quaternion(q.x(), q.y(), q.z(), q.w()));
-        tb.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "arm_base", "arm_end_point"));
+        tb.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "link00", "arm_end_point"));
     }
 
 
