@@ -1,7 +1,7 @@
 <launch>
     <node pkg="tf" type="static_transform_publisher" name="camera_to_arm_end_point_tf" args="0.04931 0.02749 -0.03655 -1.5260865 0.0352155 -1.5716474 arm_end_point camera 100" />
     <node pkg="tf" type="static_transform_publisher" name="front_left_camera_to_link00_tf" args="-0.11857818505016 -0.07559385389857 -0.13729930668359 0.13122791895 0.80231500301 -0.20524395673 -0.54492640554 frontleft_fisheye link00 100" />
-    <node pkg="tf" type="static_transform_publisher" name="torch_to_arm_end_point_tf" args="0.18531637578555 0.03484948836312 0.09639543629435 0 0 0 arm_end_point torch 100" />
+    <node pkg="tf" type="static_transform_publisher" name="torch_to_arm_end_point_tf" args="0.23963270249849 -0.00173149918402 0.05800491604931 -0.40986363814 0.48785583655 -0.53585774839 0.55395392801 arm_end_point torch 100" />
 
     <node pkg="arm_control" name="arm_control" type="arm_control" output="screen"/>
 </launch>
