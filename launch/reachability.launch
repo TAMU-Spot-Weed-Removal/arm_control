@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="camera_to_arm_end_point_tf" args="0.04931 0.02749 -0.03655 -0.502588992365 0.497824846178 -0.479412986524 0.519362990244 arm_end_point camera 100" />
+    <node pkg="tf" type="static_transform_publisher" name="torch_to_camera_tf" args="0.03484948836312, -0.09639543629435, 0.18531637578555 0.075422378518648 0.01528750950022 0.001156450579576 0.997033810607207 camera torch 100" />
+
+    <node pkg="arm_control" name="reachability_map" type="reachability_map" output="screen"/>
+</launch>
