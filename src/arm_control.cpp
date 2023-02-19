@@ -19,10 +19,12 @@ public:
         scene_observation_sub = nh.subscribe("/scene_observation_pose", 1, &ArmController::SceneObservationCallback, this);
         weed_position_sub = nh.subscribe("/weed_position", 1, &ArmController::WeedObservationCallback, this);
         weed_actuation_sub = nh.subscribe("/actuation_position", 1, &ArmController::WeedingActuationCallback, this);
+        BackToStartCallback_sub = nh.subscribe("/back_to_start", 1, &ArmController::BackToStartCallback, this);
 
         scene_observation_status_pub = nh.advertise<std_msgs::UInt8>("scene_observation_status", 1);
         weed_observation_status_pub = nh.advertise<std_msgs::UInt8>("weed_observation_status", 1);
         weed_actuation_status_pub = nh.advertise<std_msgs::UInt8>("weed_actuation_status", 1);
+        BackToStartCallback_pub = nh.advertise<std_msgs::UInt8>("back_to_start_status", 1);
 
         torch_control_pub = nh.advertise<std_msgs::String>("torch_command", 1);
     };
@@ -143,6 +145,13 @@ public:
         weed_actuation_status_pub.publish(status);
     }
 
+    void BackToStartCallback(geometry_msgs::Point32ConstPtr weed_position)
+    {
+        this->backToStart();
+        std_msgs::UInt8 status;
+        BackToStartCallback_pub.publish(status);
+    }
+
     void PublishEndPointTF()
     {
         Eigen::Matrix3d endPointRot;
@@ -169,10 +178,12 @@ private:
     ros::Subscriber scene_observation_sub;
     ros::Subscriber weed_position_sub;
     ros::Subscriber weed_actuation_sub;
+    ros::Subscriber BackToStartCallback_sub;
 
     ros::Publisher scene_observation_status_pub;
     ros::Publisher weed_observation_status_pub;
     ros::Publisher weed_actuation_status_pub;
+    ros::Publisher BackToStartCallback_pub;
 
     ros::Publisher torch_control_pub;
 
