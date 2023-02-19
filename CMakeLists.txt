@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(arm_control)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 find_package(OpenCV REQUIRED)
 
 find_package(Eigen3 REQUIRED)
+
+find_package(PCL REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -27,6 +32,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${Eigen_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -pthread")
@@ -56,6 +62,15 @@ target_link_libraries(
     Z1_SDK_Linux64
     ${PCL_LIBRARIES}
 )
+
+add_executable(reachability_map src/reachability_map.cpp)
+target_link_libraries(
+    reachability_map
+    ${catkin_LIBRARIES}
+    Z1_SDK_Linux64
+    ${PCL_LIBRARIES}
+)
+
 
 
 

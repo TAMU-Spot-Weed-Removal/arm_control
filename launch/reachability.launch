@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="arm_control" name="reachability_map" type="reachability_map" output="screen"/>
+</launch>
